@@ -3,6 +3,28 @@ from tkinter import ttk
 from ttkbootstrap import Style
 import mysql.connector
 
+listacampos = []
+
+def insertaBaseDatos():
+    print("Insertamos en la base de datos")
+    print(listacampos)
+    for campo in listacampos:
+        print(campo.get())
+
+def seleccionaTabla(mitabla):
+    global listacampos
+    print("Has pulsado la tabla de: "+mitabla)
+    for widget in contieneformulario.winfo_children():
+        widget.destroy()
+    cursor.execute("SHOW COLUMNS IN "+mitabla)
+    columnas = cursor.fetchall()
+    listacampos = []
+    for columna in columnas:  
+        ttk.Label(contieneformulario,text=columna[0]).pack(padx=5,pady=5)
+        listacampos.append(ttk.Entry(contieneformulario))
+        listacampos[-1].pack(padx=5,pady=5)
+    ttk.Button(contieneformulario,text="Insertar",command=insertaBaseDatos).pack(padx=5,pady=5)
+    
 conexion = mysql.connector.connect(
     host="localhost",
     user="superc",
@@ -24,7 +46,7 @@ contienetablas.grid(row=0,column=0,sticky="nsew",padx=5,pady=5)
 cursor.execute("SHOW TABLES IN superc")
 tablas = cursor.fetchall()
 for tabla in tablas:
-    ttk.Button(contienetablas,text=tabla[0],width=10).pack(padx=10,pady=10)
+    ttk.Button(contienetablas,text=tabla[0],width=10,command=lambda tabla=tabla[0]:seleccionaTabla(tabla)).pack(padx=10,pady=10)
 
 contieneformulario = ttk.LabelFrame(
     raiz,
